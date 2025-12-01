@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Medicine - Medical App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <h2>Add Medicine</h2>
+
+    <input id="prescription_id" type="text" placeholder="Prescription ID">
+
+    <input id="name" type="text" placeholder="Medicine Name">
+    <input id="dosage" type="text" placeholder="Dosage (e.g., 1 tablet)">
+    <input id="frequency" type="number" placeholder="Frequency per day">
+
+    <label>Times (comma-separated):</label>
+    <input id="times" type="text" placeholder="08:00, 14:00, 20:00">
+
+    <label>Start Date:</label>
+    <input id="start_date" type="date">
+
+    <label>End Date:</label>
+    <input id="end_date" type="date">
+
+    <button onclick="addMedicine()">Add Medicine</button>
+
+    <button onclick="goTo('dashboard.html')" style="background:#777;">Back</button>
+
+    <div id="message"></div>
+</div>
+
+<script src="script.js"></script>
+<script>
+    // Autofill prescription ID if stored from last created prescription
+    const lastId = localStorage.getItem("last_prescription_id");
+    if (lastId) {
+        document.getElementById("prescription_id").value = lastId;
+    }
+</script>
+
+</body>
+</html>

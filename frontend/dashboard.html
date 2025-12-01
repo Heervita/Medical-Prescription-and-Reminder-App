@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard - Medical App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <h2>Dashboard</h2>
+
+    <p id="welcome"></p>
+
+    <button onclick="goTo('add_prescription.html')">Add Prescription</button>
+    <button onclick="goTo('add_medicine.html')">Add Medicine</button>
+    <button onclick="goTo('view_prescriptions.html')">View Prescriptions</button>
+    <button onclick="goTo('view_medicines.html')">View Medicines</button>
+
+    <button style="background:#d9534f;" onclick="logout()">Logout</button>
+</div>
+
+<script src="script.js"></script>
+<script>
+    // Display welcome message
+    const name = localStorage.getItem("name") || "User";
+    document.getElementById("welcome").innerText = `Welcome, ${name}!`;
+
+    // Redirect if not logged in
+    if (!localStorage.getItem("token")) {
+        window.location.href = "index.html";
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>View Medicines - Medical App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <h2>Your Medicines</h2>
+
+    <table id="medicineTable">
+        <tr>
+            <th>Name</th>
+            <th>Dosage</th>
+            <th>Frequency</th>
+            <th>Times</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Prescription ID</th>
+        </tr>
+    </table>
+
+    <button onclick="goTo('dashboard.html')" style="background:#777;">Back</button>
+</div>
+
+<script src="script.js"></script>
+<script>
+    loadMedicines();
+</script>
+
+</body>
+</html>

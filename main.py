@@ -1,13 +1,17 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from routes import auth, prescription, reminder
-# import threading
-# from scheduler import start_scheduler
-
-# # Run scheduler in background thread
-# threading.Thread(target=start_scheduler, daemon=True).start()
-
 
 app = FastAPI()
+
+# CORS FIX
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(auth.router)
 app.include_router(prescription.router)
