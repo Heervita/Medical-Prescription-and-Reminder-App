@@ -7,15 +7,18 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 
 @router.post("/signup")
 async def signup(user: UserCreate):
+    print("DEBUG PASSWORD RECEIVED:", user.password)  # <<< THIS LINE
+
     existing = await db.users.find_one({"email": user.email})
     if existing:
         raise HTTPException(400, "Email already registered")
-    
+
     hashed = hash_password(user.password)
     user_dict = {"name": user.name, "email": user.email, "password": hashed}
 
     await db.users.insert_one(user_dict)
     return {"message": "User created"}
+
 
 @router.post("/login")
 async def login(data: UserLogin):

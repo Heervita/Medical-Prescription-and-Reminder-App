@@ -1,7 +1,10 @@
 from fastapi import FastAPI
 from routes import auth, prescription, reminder
-from scheduler import start_scheduler
-start_scheduler()
+# import threading
+# from scheduler import start_scheduler
+
+# # Run scheduler in background thread
+# threading.Thread(target=start_scheduler, daemon=True).start()
 
 
 app = FastAPI()
