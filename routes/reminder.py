@@ -9,7 +9,7 @@ async def add_medicine(m: MedicineCreate):
     medicine = m.dict()
     result = await db.medicines.insert_one(medicine)
 
-    # Attach medicine to prescription
+    
     await db.prescriptions.update_one(
         {"_id": m.prescription_id},
         {"$push": {"medicines": str(result.inserted_id)}}

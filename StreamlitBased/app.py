@@ -138,16 +138,15 @@ def check_reminders_and_notify():
             if pref in ["email", "both"]:
                 if email:
                     sent = send_email(email, subject, html)
-            # create in-app notification if popup or both
+            
             if pref in ["popup", "both"]:
                 create_notification_record(user_id=user_id, medicine_name=m.get("name"), time_local=time_now, medicine_id=m.get("_id"), sent_email=sent)
             else:
-                # even if user prefers email only, still store a record of the sent email (optional)
+               
                 if sent:
                     create_notification_record(user_id=user_id, medicine_name=m.get("name"), time_local=time_now, medicine_id=m.get("_id"), sent_email=sent)
             if notes_col is not None:
-                # Log the attempt as well for historical tracking (non-duplicate)
-                # (create_notification_record already handles insert; this block can be used for additional logs)
+                
                 pass
             print(f"Reminder processed for user={user.get('email')} med={m.get('name')} pref={pref} sent_email={sent}")
     except Exception as e:
@@ -514,7 +513,7 @@ def notification_settings_ui():
             st.error("DB not configured.")
     st.markdown("</div>", unsafe_allow_html=True)
 
-# Sidebar (buttons with icons + Notification Settings)
+
 with st.sidebar:
     st.markdown("<div style='font-weight:800;color:#11ff88;font-size:20px;margin-bottom:12px'>MedGlow</div>", unsafe_allow_html=True)
 
@@ -522,7 +521,7 @@ with st.sidebar:
         if st.button("🔐 Login", key="b_login"): st.session_state["page"]="login"
         if st.button("✍️ Signup", key="b_signup"): st.session_state["page"]="signup"
     else:
-        # show user info and quick unread count
+        
         try:
             unread_count = 0
             if notes_col is not None:
@@ -538,7 +537,7 @@ with st.sidebar:
         if st.button(f"🔔 Notifications ({unread_count})", key="b_notif"): st.session_state["page"]="notif"
         if st.button("🚪 Logout", key="b_logout"): logout_ui()
 
-# Main routing
+
 page = st.session_state.get("page", "login")
 
 if page == "login":
@@ -546,7 +545,7 @@ if page == "login":
 elif page == "signup":
     signup_ui()
 else:
-    # protect authenticated pages
+    
     if st.session_state["user"] is None:
         st.warning("Please login first.")
         st.session_state["page"] = "login"
