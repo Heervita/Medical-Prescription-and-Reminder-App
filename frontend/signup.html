@@ -6,6 +6,21 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <link rel="stylesheet" href="style.css" />
 </head>
+<!-- TOP NAV BAR -->
+<header class="topnav">
+    <div class="logo">MedGlow</div>
+
+    <nav class="nav-links">
+        <a onclick="goTo('dashboard.html')">Dashboard</a>
+        <a onclick="goTo('add_prescription.html')">Add Prescription</a>
+        <a onclick="goTo('add_medicine.html')">Add Medicine</a>
+        <a onclick="goTo('view_prescriptions.html')">Prescriptions</a>
+        <a onclick="goTo('view_medicines.html')">Medicines</a>
+    </nav>
+
+    <button class="logout-btn" onclick="logout()">Logout</button>
+</header>
+
 <body class="neo-bg">
   <main class="center-shell">
     <section class="auth-card glow-card">

@@ -1,78 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="utf-8" />
-  <title>Dashboard · MedGlow</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="stylesheet" href="style.css" />
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="neo-bg">
-  <div class="app-shell">
-    <nav class="sidebar">
-      <div class="logo">MedGlow</div>
-      <ul class="nav">
-        <li><button onclick="goTo('dashboard.html')" class="nav-btn active">Dashboard</button></li>
-        <li><button onclick="goTo('add_prescription.html')" class="nav-btn">Add Prescription</button></li>
-        <li><button onclick="goTo('add_medicine.html')" class="nav-btn">Add Medicine</button></li>
-        <li><button onclick="goTo('view_prescriptions.html')" class="nav-btn">Prescriptions</button></li>
-        <li><button onclick="goTo('view_medicines.html')" class="nav-btn">Medicines</button></li>
-      </ul>
-      <div class="side-footer">
-        <button class="nav-btn danger" onclick="logout()">Logout</button>
-      </div>
+
+<body class="neo-bg fade-in">
+
+<header class="topnav">
+    <div class="logo">MedGlow</div>
+    <nav class="nav-links">
+        <a onclick="goTo('dashboard.html')">Dashboard</a>
+        <a onclick="goTo('add_prescription.html')">Add Prescription</a>
+        <a onclick="goTo('add_medicine.html')">Add Medicine</a>
+        <a onclick="goTo('view_prescriptions.html')">Prescriptions</a>
+        <a onclick="goTo('view_medicines.html')">Medicines</a>
     </nav>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+</header>
 
-    <main class="main">
-      <header class="main-header">
-        <div>
-          <h2 class="title">Welcome back, <span id="welcome-name">User</span> 👋</h2>
-          <p class="tiny">Here's a snapshot of your prescriptions and upcoming reminders.</p>
-        </div>
-        <div class="profile-pill">Heervita</div>
-      </header>
+<div class="page-container">
+    <h2 class="title">Welcome, <span id="username"></span> 💚</h2>
+    <p class="subtitle">Your health dashboard at a glance</p>
 
-      <section class="grid">
-        <article class="card glow-card action-card" onclick="goTo('add_prescription.html')">
-          <h3>+ New Prescription</h3>
-          <p>Create a prescription and add medicines.</p>
-        </article>
+    <div class="glow-card">
+        <button class="save-btn" onclick="goTo('add_prescription.html')">Add Prescription</button>
+        <button class="save-btn" onclick="goTo('add_medicine.html')">Add Medicine</button>
+        <button class="save-btn" onclick="goTo('view_prescriptions.html')">View Prescriptions</button>
+        <button class="save-btn" onclick="goTo('view_medicines.html')">View Medicines</button>
+    </div>
+</div>
 
-        <article class="card glow-card action-card" onclick="goTo('add_medicine.html')">
-          <h3>+ Add Medicine</h3>
-          <p>Quickly attach medicine to a prescription.</p>
-        </article>
+<script src="script.js"></script>
+<script>
+document.getElementById("username").innerText = localStorage.getItem("name") || "User";
+</script>
 
-        <article class="card glow-card">
-          <h4>Upcoming reminders</h4>
-          <div id="reminderList">No reminders scheduled.</div>
-        </article>
-
-        <article class="card glow-card">
-          <h4>Recent prescriptions</h4>
-          <div id="recentList">—</div>
-        </article>
-      </section>
-
-      <section class="table-area">
-        <h4>All medicines</h4>
-        <div id="medPreview">Loading…</div>
-      </section>
-    </main>
-  </div>
-
-  <script src="script.js"></script>
-  <script>
-    // small init
-    document.getElementById('welcome-name').innerText = localStorage.getItem('name') || 'User';
-    if (!localStorage.getItem("token")) window.location.href = "index.html";
-    // Optionally load summaries (hooks)
-    (async function(){ 
-      try { 
-        // load small previews using functions already in script.js
-        await loadPrescriptionsPreview && loadPrescriptionsPreview();
-        await loadMedicinesPreview && loadMedicinesPreview();
-      } catch(e){ console.warn(e) }
-    })();
-  </script>
 </body>
 </html>

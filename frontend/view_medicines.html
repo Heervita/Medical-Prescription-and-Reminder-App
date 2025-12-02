@@ -1,61 +1,50 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Medicines · MedGlow</title>
-  <link rel="stylesheet" href="style.css">
+    <title>Medicines</title>
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body class="neo-bg fade-in">
 
-  <div class="app-shell">
-    
-    <!-- Sidebar -->
-    <nav class="sidebar">
-      <div class="logo">MedGlow</div>
-      <ul class="nav">
-        <li><button class="nav-btn" onclick="goTo('dashboard.html')">Dashboard</button></li>
-        <li><button class="nav-btn" onclick="goTo('add_prescription.html')">Add Prescription</button></li>
-        <li><button class="nav-btn" onclick="goTo('add_medicine.html')">Add Medicine</button></li>
-        <li><button class="nav-btn" onclick="goTo('view_prescriptions.html')">Prescriptions</button></li>
-        <li><button class="nav-btn active">Medicines</button></li>
-      </ul>
-      <div class="side-footer">
-        <button class="nav-btn danger" onclick="logout()">Logout</button>
-      </div>
+<header class="topnav">
+    <div class="logo">MedGlow</div>
+    <nav class="nav-links">
+        <a onclick="goTo('dashboard.html')">Dashboard</a>
+        <a onclick="goTo('add_prescription.html')">Add Prescription</a>
+        <a onclick="goTo('add_medicine.html')">Add Medicine</a>
+        <a onclick="goTo('view_prescriptions.html')">Prescriptions</a>
+        <a onclick="goTo('view_medicines.html')">Medicines</a>
     </nav>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+</header>
 
+<div class="page-container">
 
-    <!-- MAIN PANEL -->
-    <main class="main">
-      <h2 class="title">All Medicines 💚</h2>
-      <p class="tiny">Here are all medicines across your prescriptions.</p>
+    <h2 class="title">All Medicines 💚</h2>
+    <p class="subtitle">Here are all medicines across your prescriptions</p>
 
-      <section class="glow-card" style="padding:20px; margin-top:15px;">
-        <table class="view-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Dosage</th>
-              <th>Frequency</th>
-              <th>Times</th>
-              <th>Start</th>
-              <th>End</th>
-              <th>Prescription ID</th>
-            </tr>
-          </thead>
-          <tbody id="medicineTable"></tbody>
+    <div class="table-box glow-card">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Dosage</th>
+                    <th>Frequency</th>
+                    <th>Times</th>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>Prescription ID</th>
+                </tr>
+            </thead>
+            <tbody id="medicineTable"></tbody>
         </table>
-      </section>
+    </div>
 
-    </main>
+</div>
 
-  </div>
-
-  <script src="script.js"></script>
-  <script>
-    if (!localStorage.getItem("token")) window.location.href = "index.html";
-    loadMedicines();
-  </script>
+<script src="script.js"></script>
+<script> loadMedicines(); </script>
 
 </body>
 </html>

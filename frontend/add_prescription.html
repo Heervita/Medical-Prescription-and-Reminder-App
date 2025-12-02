@@ -1,32 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Add Prescription · MedGlow</title>
-  <link rel="stylesheet" href="style.css">
+    <title>Add Prescription</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body class="neo-bg fade-in">
 
-<div class="form-wrapper">
-  <div class="glow-card large">
+<header class="topnav">
+    <div class="logo">MedGlow</div>
+    <nav class="nav-links">
+        <a onclick="goTo('dashboard.html')">Dashboard</a>
+        <a onclick="goTo('add_prescription.html')">Add Prescription</a>
+        <a onclick="goTo('add_medicine.html')">Add Medicine</a>
+        <a onclick="goTo('view_prescriptions.html')">Prescriptions</a>
+        <a onclick="goTo('view_medicines.html')">Medicines</a>
+    </nav>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+</header>
+
+<div class="page-container">
 
     <h2 class="title">Add Prescription 📝</h2>
 
-    <input id="title" class="input large-input" placeholder="Title (e.g., General Checkup)">
+    <div class="glow-card">
+        <input id="title" class="input" placeholder="Title (e.g., General Checkup)">
+        <input id="doctor_name" class="input" placeholder="Doctor's Name">
+        <input type="date" id="date" class="input">
 
-    <input id="doctor_name" class="input large-input" placeholder="Doctor's name">
+        <button class="save-btn" onclick="addPrescription()">Save</button>
+        <button class="back-btn" onclick="goTo('dashboard.html')">Back</button>
+    </div>
 
-    <label>Date</label>
-    <input type="date" id="date" class="input">
-
-    <div id="message"></div>
-
-    <button class="save-btn" onclick="addPrescription()">Save</button>
-    <button class="back-btn" onclick="goTo('dashboard.html')">Back</button>
-  </div>
 </div>
 
 <script src="script.js"></script>
+
 </body>
 </html>
