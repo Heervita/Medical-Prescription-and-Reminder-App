@@ -1,29 +1,101 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8">
   <title>Add Medicine · MedGlow</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
-<body class="neo-bg">
-  <div class="panel-shell">
-    <div class="panel glow-card">
-      <h2>Add Medicine</h2>
-      <input id="prescription_id" placeholder="Prescription ID (or leave blank)">
-      <input id="name" placeholder="Medicine name">
-      <input id="dosage" placeholder="Dosage (e.g., 1 tablet)">
-      <input id="frequency" type="number" placeholder="Times per day">
-      <input id="times" placeholder="Times (08:00, 14:00)">
-      <label>Start Date</label>
-      <input id="start_date" type="date">
-      <label>End Date</label>
-      <input id="end_date" type="date">
-      <button class="btn primary" onclick="addMedicine()">Save Medicine</button>
-      <div id="message" class="msg"></div>
-      <button class="btn" onclick="goTo('dashboard.html')">Back</button>
-    </div>
-  </div>
 
-  <script src="script.js"></script>
+<body class="neo-bg fade-in">
+
+<div class="form-wrapper">
+  <div class="glow-card large">
+
+    <h2 class="title">Add Medicine 💊</h2>
+
+    <div class="form-grid">
+
+      <input type="text" id="prescription_id" placeholder="Prescription ID (or leave blank)" class="input">
+      <input type="text" id="name" placeholder="Medicine Name" class="input">
+      <input type="text" id="dosage" placeholder="Dosage (e.g., 1 tablet)" class="input">
+
+      <input type="number" id="frequency" placeholder="Times per day" class="input">
+
+      <!-- TIME PICKERS -->
+      <div class="time-box">
+        <label>Reminder Times</label>
+
+        <div id="timeContainer"></div>
+
+        <button type="button" class="add-btn" onclick="addTimePicker()">
+          ➕ Add Time
+        </button>
+      </div>
+
+      <label>Start Date</label>
+      <input type="date" id="start_date" class="input">
+
+      <label>End Date</label>
+      <input type="date" id="end_date" class="input">
+
+    </div>
+
+    <div id="message" class="message"></div>
+
+    <button class="save-btn" onclick="saveMed()">Save Medicine</button>
+
+    <button class="back-btn" onclick="goTo('dashboard.html')">Back</button>
+  </div>
+</div>
+
+<script src="script.js"></script>
+
+<script>
+  function addTimePicker() {
+      const container = document.getElementById("timeContainer");
+      const div = document.createElement("div");
+      div.className = "time-row";
+
+      div.innerHTML = `
+          <input type="time" class="timeInput input" required>
+          <button class="remove-btn" onclick="this.parentElement.remove()">✖</button>
+      `;
+
+      container.appendChild(div);
+  }
+
+  function saveMed() {
+      const token = localStorage.getItem("token");
+      if (!token) return alert("Login again!");
+
+      let times = [];
+      document.querySelectorAll(".timeInput").forEach(t => times.push(t.value));
+
+      fetch(`${BASE_URL}/medicine/`, {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify({
+              prescription_id: document.getElementById("prescription_id").value,
+              name: document.getElementById("name").value,
+              dosage: document.getElementById("dosage").value,
+              frequency: parseInt(document.getElementById("frequency").value),
+              times: times,
+              start_date: document.getElementById("start_date").value,
+              end_date: document.getElementById("end_date").value
+          })
+      })
+      .then(r => r.json())
+      .then(d => {
+          document.getElementById("message").innerText = "Medicine Saved!";
+      });
+  }
+
+  // ADD ONE TIME PICKER BY DEFAULT
+  addTimePicker();
+</script>
+
 </body>
 </html>

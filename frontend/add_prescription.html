@@ -1,23 +1,32 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8">
   <title>Add Prescription · MedGlow</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
-<body class="neo-bg">
-  <div class="panel-shell">
-    <div class="panel glow-card">
-      <h2>Add Prescription</h2>
-      <input id="title" placeholder="Title (e.g., 'General Checkup')">
-      <input id="doctor_name" placeholder="Doctor's name">
-      <input id="date" type="date">
-      <button class="btn primary" onclick="addPrescription()">Save</button>
-      <div id="message" class="msg"></div>
-      <button class="btn" onclick="goTo('dashboard.html')">Back</button>
-    </div>
-  </div>
 
-  <script src="script.js"></script>
+<body class="neo-bg fade-in">
+
+<div class="form-wrapper">
+  <div class="glow-card large">
+
+    <h2 class="title">Add Prescription 📝</h2>
+
+    <input id="title" class="input large-input" placeholder="Title (e.g., General Checkup)">
+
+    <input id="doctor_name" class="input large-input" placeholder="Doctor's name">
+
+    <label>Date</label>
+    <input type="date" id="date" class="input">
+
+    <div id="message"></div>
+
+    <button class="save-btn" onclick="addPrescription()">Save</button>
+    <button class="back-btn" onclick="goTo('dashboard.html')">Back</button>
+  </div>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
