@@ -121,7 +121,7 @@ def check_reminders_and_notify():
                 continue
             email = user.get("email")
             if not email:
-                # even if no email, allow popup notifications if user prefers
+                
                 pass
             pref = user.get("notification_pref", "email")
             subject = f"MedGlow Reminder — {m.get('name')}"

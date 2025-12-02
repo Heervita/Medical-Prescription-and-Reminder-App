@@ -7,4 +7,4 @@ load_dotenv()
 MONGO_URL = os.getenv("MONGO_URL")
 
 client = AsyncIOMotorClient(MONGO_URL)
-db = client["medical_app"]   # database name
+db = client["medical_app"]   

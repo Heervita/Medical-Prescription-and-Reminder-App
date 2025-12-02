@@ -4,7 +4,7 @@ from routes import auth, prescription, reminder
 
 app = FastAPI()
 
-# CORS FIX
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
