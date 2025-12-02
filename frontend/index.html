@@ -1,24 +1,34 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Login - Medical App</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <title>Login · MedGlow</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body>
+<body class="neo-bg">
+  <main class="center-shell">
+    <section class="auth-card glow-card">
+      <header class="auth-head">
+        <h1 class="brand">MedGlow</h1>
+        <p class="sub">Careful reminders. Gentle design.</p>
+      </header>
 
-<div class="container">
-    <h2>Login</h2>
+      <div class="form">
+        <input id="email" type="email" placeholder="Email" autocomplete="username" />
+        <input id="password" type="password" placeholder="Password" autocomplete="current-password" />
+        <button class="btn primary" onclick="login()">Sign In</button>
+        <p class="muted">Don't have an account? <a href="signup.html">Create one</a></p>
+        <div id="message" class="msg"></div>
+      </div>
+    </section>
 
-    <input id="email" type="email" placeholder="Email">
-    <input id="password" type="password" placeholder="Password">
+    <aside class="visual-panel">
+      <div class="orb"></div>
+      <div class="timer-mock">⏱ 25:00</div>
+    </aside>
+  </main>
 
-    <button onclick="login()">Login</button>
-
-    <p>Don't have an account? <a href="signup.html">Signup</a></p>
-
-    <div id="message"></div>
-</div>
-
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>

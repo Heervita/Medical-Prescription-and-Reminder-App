@@ -1,25 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Signup - Medical App</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <title>Signup · MedGlow</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body>
+<body class="neo-bg">
+  <main class="center-shell">
+    <section class="auth-card glow-card">
+      <header class="auth-head">
+        <h1 class="brand">Create account</h1>
+        <p class="sub">Start gentle reminders for your meds.</p>
+      </header>
 
-<div class="container">
-    <h2>Signup</h2>
+      <div class="form">
+        <input id="name" type="text" placeholder="Full name" />
+        <input id="email" type="email" placeholder="Email" />
+        <input id="password" type="password" placeholder="Choose a password" />
+        <button class="btn primary" onclick="signup()">Create Account</button>
+        <p class="muted">Already registered? <a href="index.html">Sign in</a></p>
+        <div id="message" class="msg"></div>
+      </div>
+    </section>
 
-    <input id="name" type="text" placeholder="Full Name">
-    <input id="email" type="email" placeholder="Email">
-    <input id="password" type="password" placeholder="Password">
+    <aside class="visual-panel">
+      <div class="orb"></div>
+      <div class="sparkle">✨</div>
+    </aside>
+  </main>
 
-    <button onclick="signup()">Create Account</button>
-
-    <p>Already have an account? <a href="index.html">Login</a></p>
-
-    <div id="message"></div>
-</div>
-
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>

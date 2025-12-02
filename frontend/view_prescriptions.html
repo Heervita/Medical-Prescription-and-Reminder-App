@@ -1,30 +1,55 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>View Prescriptions - Medical App</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Prescriptions · MedGlow</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="neo-bg fade-in">
 
-<div class="container">
-    <h2>Your Prescriptions</h2>
+  <div class="app-shell">
+    <!-- Sidebar -->
+    <nav class="sidebar">
+      <div class="logo">MedGlow</div>
+      <ul class="nav">
+        <li><button class="nav-btn" onclick="goTo('dashboard.html')">Dashboard</button></li>
+        <li><button class="nav-btn" onclick="goTo('add_prescription.html')">Add Prescription</button></li>
+        <li><button class="nav-btn" onclick="goTo('add_medicine.html')">Add Medicine</button></li>
+        <li><button class="nav-btn active">Prescriptions</button></li>
+        <li><button class="nav-btn" onclick="goTo('view_medicines.html')">Medicines</button></li>
+      </ul>
+      <div class="side-footer">
+        <button class="nav-btn danger" onclick="logout()">Logout</button>
+      </div>
+    </nav>
 
-    <table id="prescriptionTable">
-        <tr>
-            <th>Title</th>
-            <th>Doctor</th>
-            <th>Date</th>
-            <th>Medicines</th>
-        </tr>
-    </table>
+    <!-- MAIN PANEL -->
+    <main class="main">
+      <h2 class="title">All Prescriptions 💊</h2>
+      <p class="tiny">Your saved medical prescriptions appear below.</p>
 
-    <button onclick="goTo('dashboard.html')" style="background:#777;">Back</button>
-</div>
+      <section class="glow-card" style="padding:20px; margin-top:15px;">
+        <table class="view-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Doctor</th>
+              <th>Date</th>
+              <th>Medicines</th>
+            </tr>
+          </thead>
+          <tbody id="prescriptionTable"></tbody>
+        </table>
+      </section>
+    </main>
 
-<script src="script.js"></script>
-<script>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    if (!localStorage.getItem("token")) window.location.href = "index.html";
     loadPrescriptions();
-</script>
+  </script>
 
 </body>
 </html>

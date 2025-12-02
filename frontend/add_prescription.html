@@ -1,26 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Add Prescription - Medical App</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <title>Add Prescription · MedGlow</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body>
+<body class="neo-bg">
+  <div class="panel-shell">
+    <div class="panel glow-card">
+      <h2>Add Prescription</h2>
+      <input id="title" placeholder="Title (e.g., 'General Checkup')">
+      <input id="doctor_name" placeholder="Doctor's name">
+      <input id="date" type="date">
+      <button class="btn primary" onclick="addPrescription()">Save</button>
+      <div id="message" class="msg"></div>
+      <button class="btn" onclick="goTo('dashboard.html')">Back</button>
+    </div>
+  </div>
 
-<div class="container">
-    <h2>Add Prescription</h2>
-
-    <input id="title" type="text" placeholder="Prescription Title">
-    <input id="doctor_name" type="text" placeholder="Doctor's Name">
-    <input id="date" type="date">
-
-    <button onclick="addPrescription()">Add Prescription</button>
-
-    <button onclick="goTo('dashboard.html')" style="background:#777;">Back</button>
-
-    <div id="message"></div>
-</div>
-
-<script src="script.js"></script>
-
+  <script src="script.js"></script>
 </body>
 </html>
