@@ -1,0 +1,5 @@
+streamlit
+pymongo
+passlib[bcrypt]
+python-dotenv
+apscheduler
