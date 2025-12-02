@@ -31,7 +31,7 @@ def hash_password(password: str) -> str:
 def verify_password(password: str, hashed: str) -> bool:
     try:
         return pwd_ctx.verify(password, hashed)
-    except:
+    except Exception:
         return False
 
 @st.cache_resource
@@ -74,6 +74,23 @@ def send_email(to_email: str, subject: str, html_body: str) -> bool:
         print("Email send error:", e)
         return False
 
+def create_notification_record(user_id, medicine_name, time_local, medicine_id=None, sent_email=False):
+    if notes_col is None:
+        return
+    rec = {
+        "user_id": user_id,
+        "medicine_id": medicine_id,
+        "medicine_name": medicine_name,
+        "time_local": time_local,
+        "read": False,
+        "sent_email": bool(sent_email),
+        "created_at": datetime.utcnow()
+    }
+    try:
+        notes_col.insert_one(rec)
+    except Exception as e:
+        print("Failed to insert notification record:", e)
+
 def get_scheduler():
     if "scheduler" not in st.session_state:
         sched = BackgroundScheduler()
@@ -104,7 +121,9 @@ def check_reminders_and_notify():
                 continue
             email = user.get("email")
             if not email:
-                continue
+                # even if no email, allow popup notifications if user prefers
+                pass
+            pref = user.get("notification_pref", "email")
             subject = f"MedGlow Reminder — {m.get('name')}"
             html = (
                 f"<p>Hi {user.get('name')},</p>"
@@ -114,17 +133,23 @@ def check_reminders_and_notify():
                 f"<p><strong>Time:</strong> {time_now}</p>"
                 f"<p>— MedGlow</p>"
             )
-            sent = send_email(email, subject, html)
+
+            sent = False
+            if pref in ["email", "both"]:
+                if email:
+                    sent = send_email(email, subject, html)
+            # create in-app notification if popup or both
+            if pref in ["popup", "both"]:
+                create_notification_record(user_id=user_id, medicine_name=m.get("name"), time_local=time_now, medicine_id=m.get("_id"), sent_email=sent)
+            else:
+                # even if user prefers email only, still store a record of the sent email (optional)
+                if sent:
+                    create_notification_record(user_id=user_id, medicine_name=m.get("name"), time_local=time_now, medicine_id=m.get("_id"), sent_email=sent)
             if notes_col is not None:
-                notes_col.insert_one({
-                    "user_id": user_id,
-                    "email": email,
-                    "medicine_id": m.get("_id"),
-                    "time_utc": datetime.utcnow(),
-                    "time_local": time_now,
-                    "sent_email": bool(sent)
-                })
-            print(f"Reminder sent to {email} for {m.get('name')} (sent={sent})")
+                # Log the attempt as well for historical tracking (non-duplicate)
+                # (create_notification_record already handles insert; this block can be used for additional logs)
+                pass
+            print(f"Reminder processed for user={user.get('email')} med={m.get('name')} pref={pref} sent_email={sent}")
     except Exception as e:
         print("Reminder job error:", e)
 
@@ -223,6 +248,7 @@ header[data-testid="stHeader"], footer { display: none; }
 </style>
 """
 st.markdown(SIDEBAR_CSS, unsafe_allow_html=True)
+
 def time_to_str(t):
     return t.strftime("%H:%M")
 
@@ -237,6 +263,7 @@ def signup_ui():
     name = st.text_input("Full name", key="su_name")
     email = st.text_input("Email", key="su_email")
     password = st.text_input("Password", type="password", key="su_pass")
+    notif_pref = st.selectbox("Notification Preference", ["email", "popup", "both"], index=0, key="su_notif")
     if st.button("Create account", key="su_btn"):
         if not (name and email and password):
             st.warning("Please fill all fields.")
@@ -244,7 +271,7 @@ def signup_ui():
             st.error("Email already registered.")
         else:
             hashed = hash_password(password)
-            doc = {"name": name, "email": email, "password": hashed}
+            doc = {"name": name, "email": email, "password": hashed, "notification_pref": notif_pref}
             if users_col is not None:
                 res = users_col.insert_one(doc)
                 st.success("Account created. Redirecting to login...")
@@ -270,7 +297,12 @@ def login_ui():
             if not user:
                 st.error("No user found with that email.")
             elif verify_password(password, user["password"]):
-                st.session_state["user"] = {"_id": user["_id"], "name": user["name"], "email": user["email"]}
+                st.session_state["user"] = {
+                    "_id": user["_id"],
+                    "name": user["name"],
+                    "email": user["email"],
+                    "notification_pref": user.get("notification_pref", "email")
+                }
                 st.success(f"Welcome {user['name']}! Redirecting to dashboard...")
                 st.session_state["page"] = "dashboard"
                 time.sleep(0.4)
@@ -278,7 +310,6 @@ def login_ui():
             else:
                 st.error("Incorrect password.")
     st.markdown("</div>", unsafe_allow_html=True)
-
 def logout_ui():
     st.session_state["user"] = None
     st.session_state["page"] = "login"
@@ -289,11 +320,37 @@ def logout_ui():
 def dashboard_ui():
     st.markdown("<div class='main-content slide-in-left'>", unsafe_allow_html=True)
     st.header(f"Welcome, {st.session_state['user']['name']}")
+    # Show unread in-app notifications as toast (non-blocking)
+    if notes_col is not None:
+        try:
+            unread = list(notes_col.find({
+                "user_id": st.session_state["user"]["_id"],
+                "read": False
+            }).sort("created_at", -1))
+        except Exception as e:
+            unread = []
+            print("Failed to fetch notifications:", e)
+        for n in unread:
+            msg = f"Reminder: {n.get('medicine_name','Medicine')} — {n.get('time_local','')}"
+            try:
+                st.toast(msg, icon="🔔")
+            except Exception:
+                # fallback if st.toast isn't available
+                st.info(msg)
+            try:
+                notes_col.update_one({"_id": n["_id"]}, {"$set": {"read": True}})
+            except Exception as e:
+                print("Failed to mark notification read:", e)
+
     st.subheader("Upcoming reminders (next 24 hours)")
     today = date.today().strftime("%Y-%m-%d")
     meds = []
     if med_col is not None:
-        meds = list(med_col.find({"user_id": st.session_state["user"]["_id"]}))
+        try:
+            meds = list(med_col.find({"user_id": st.session_state["user"]["_id"]}))
+        except Exception as e:
+            meds = []
+            print("Failed to fetch medicines:", e)
     now = datetime.now()
     now_minutes = now.hour * 60 + now.minute
     upcoming = []
@@ -335,8 +392,12 @@ def add_prescription_ui():
                 "created_at": datetime.utcnow()
             }
             if presc_col is not None:
-                presc_col.insert_one(doc)
-                st.success("Saved.")
+                try:
+                    presc_col.insert_one(doc)
+                    st.success("Saved.")
+                except Exception as e:
+                    st.error("Failed to save prescription.")
+                    print("Insert prescription error:", e)
             else:
                 st.error("DB not configured.")
     st.markdown("</div>", unsafe_allow_html=True)
@@ -372,8 +433,12 @@ def add_medicine_ui():
                 "created_at": datetime.utcnow()
             }
             if med_col is not None:
-                med_col.insert_one(med_doc)
-                st.success("Medicine saved.")
+                try:
+                    med_col.insert_one(med_doc)
+                    st.success("Medicine saved.")
+                except Exception as e:
+                    st.error("Failed to save medicine.")
+                    print("Insert medicine error:", e)
             else:
                 st.error("DB not configured.")
     st.markdown("</div>", unsafe_allow_html=True)
@@ -385,13 +450,15 @@ def view_prescriptions_ui():
         st.error("DB not configured.")
         st.markdown("</div>", unsafe_allow_html=True)
         return
-    rows = list(presc_col.find({"user_id": st.session_state["user"]["_id"]}).sort("created_at", -1))
+    try:
+        rows = list(presc_col.find({"user_id": st.session_state["user"]["_id"]}).sort("created_at", -1))
+    except Exception as e:
+        rows = []
+        print("Fetch prescriptions error:", e)
     if not rows:
         st.info("No prescriptions yet.")
     else:
-        df = pd.DataFrame([
-            {"Title": r["title"], "Doctor": r.get("doctor_name",""), "Date": r.get("date","-")}
-        for r in rows])
+        df = pd.DataFrame([{"Title": r["title"], "Doctor": r.get("doctor_name",""), "Date": r.get("date","-")} for r in rows])
         st.table(df)
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -402,7 +469,11 @@ def view_medicines_ui():
         st.error("DB not configured.")
         st.markdown("</div>", unsafe_allow_html=True)
         return
-    rows = list(med_col.find({"user_id": st.session_state["user"]["_id"]}).sort("created_at", -1))
+    try:
+        rows = list(med_col.find({"user_id": st.session_state["user"]["_id"]}).sort("created_at", -1))
+    except Exception as e:
+        rows = []
+        print("Fetch medicines error:", e)
     if not rows:
         st.info("No medicines yet.")
     else:
@@ -418,6 +489,32 @@ def view_medicines_ui():
         st.dataframe(df, use_container_width=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
+def notification_settings_ui():
+    st.markdown("<div class='main-content slide-in-left'>", unsafe_allow_html=True)
+    st.header("Notification Settings")
+    user = st.session_state["user"]
+    current_pref = user.get("notification_pref", "email")
+    choices = ["email", "popup", "both"]
+    try:
+        idx = choices.index(current_pref) if current_pref in choices else 0
+    except Exception:
+        idx = 0
+    new_pref = st.radio("Choose how you want reminders:", choices, index=idx, key="notif_choice")
+    if st.button("Save Settings", key="save_notif"):
+        if users_col is not None:
+            try:
+                users_col.update_one({"_id": user["_id"]}, {"$set": {"notification_pref": new_pref}})
+                st.session_state["user"]["notification_pref"] = new_pref
+                st.success("Updated notification preference.")
+                st.experimental_rerun()
+            except Exception as e:
+                st.error("Failed to update preference.")
+                print("Update notif pref error:", e)
+        else:
+            st.error("DB not configured.")
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# Sidebar (buttons with icons + Notification Settings)
 with st.sidebar:
     st.markdown("<div style='font-weight:800;color:#11ff88;font-size:20px;margin-bottom:12px'>MedGlow</div>", unsafe_allow_html=True)
 
@@ -425,14 +522,23 @@ with st.sidebar:
         if st.button("🔐 Login", key="b_login"): st.session_state["page"]="login"
         if st.button("✍️ Signup", key="b_signup"): st.session_state["page"]="signup"
     else:
+        # show user info and quick unread count
+        try:
+            unread_count = 0
+            if notes_col is not None:
+                unread_count = notes_col.count_documents({"user_id": st.session_state["user"]["_id"], "read": False})
+        except Exception:
+            unread_count = 0
         st.markdown(f"<div style='margin-bottom:12px;color:#eafff4'>Signed in: <b>{st.session_state['user']['name']}</b></div>", unsafe_allow_html=True)
-        if st.button("🏠 Dashboard", key="b_dash"): st.session_state["page"]="dashboard"
+        if st.button(f"🏠 Dashboard", key="b_dash"): st.session_state["page"]="dashboard"
         if st.button("➕ Add Prescription", key="b_addp"): st.session_state["page"]="add_p"
         if st.button("💊 Add Medicine", key="b_addm"): st.session_state["page"]="add_m"
         if st.button("📄 Prescriptions", key="b_viewp"): st.session_state["page"]="view_p"
         if st.button("🧾 Medicines", key="b_viewm"): st.session_state["page"]="view_m"
+        if st.button(f"🔔 Notifications ({unread_count})", key="b_notif"): st.session_state["page"]="notif"
         if st.button("🚪 Logout", key="b_logout"): logout_ui()
 
+# Main routing
 page = st.session_state.get("page", "login")
 
 if page == "login":
@@ -440,6 +546,7 @@ if page == "login":
 elif page == "signup":
     signup_ui()
 else:
+    # protect authenticated pages
     if st.session_state["user"] is None:
         st.warning("Please login first.")
         st.session_state["page"] = "login"
@@ -455,31 +562,9 @@ else:
             view_prescriptions_ui()
         elif page == "view_m":
             view_medicines_ui()
+        elif page == "notif":
+            notification_settings_ui()
         else:
             st.info("Page not found. Resetting.")
             st.session_state["page"] = "dashboard"
             st.rerun()
-def notification_settings_ui():
-    st.markdown("<div class='main-content slide-in-left'>", unsafe_allow_html=True)
-    st.header("Notification Settings")
-
-    user = st.session_state["user"]
-    current_pref = user.get("notification_pref", "email")
-
-    new_pref = st.radio(
-        "Choose how you want reminders:",
-        ["email", "popup", "both"],
-        index=["email", "popup", "both"].index(current_pref)
-    )
-
-    if st.button("Save Settings"):
-        if users_col is not None:
-            users_col.update_one(
-                {"_id": user["_id"]},
-                {"$set": {"notification_pref": new_pref}}
-            )
-            st.session_state["user"]["notification_pref"] = new_pref
-            st.success("Updated!")
-            st.rerun()
-
-    st.markdown("</div>", unsafe_allow_html=True)
